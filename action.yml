@@ -24,7 +24,7 @@ runs:
 
     - name: setup git pandiff
       run: |
-        git config --global difftool.pandiff.cmd 'pandiff ${{ github.event.pull_request.base.ref }} "$LOCAL" -t html'
+        git config --global difftool.pandiff.cmd 'pandiff ${{ github.event.pull_request.base.ref }} $HEAD -t html'
         git config --global alias.pandiff 'difftool -t pandiff -y'
       shell: bash
 
