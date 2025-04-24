@@ -2,21 +2,19 @@ name: 'Pandiff Prose Changes'
 description: 'Runs pandiff on files changed in a PR'
 author: 'carafelix'
 
-inputs:
-  file1:
-    description: 'file1'
-  file2:
-    description: 'file2'
-
 outputs:
   diffs:
     description: 'Concatenated diffs for changed files'
+
+
 
 runs:
   using: "composite"
   steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Install dependencies
       run: npm i -g pandiff
@@ -29,5 +27,12 @@ runs:
       shell: bash
 
     - name: Run pandiff with input
-      run: echo $(git pandiff)
+      run: echo "diffs=$(git pandiff)" >> $GITHUB_OUTPUT
+      id: diffs
+      shell: bash
+
+    - name: Show PR branches
+      run: |
+        echo "Base branch: ${{ github.event.pull_request.base.ref }}"
+        echo "Head branch: ${{ github.event.pull_request.head.ref }}"
       shell: bash
