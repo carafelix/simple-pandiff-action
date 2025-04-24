@@ -18,6 +18,10 @@ runs:
       run: git fetch origin ${{ github.event.pull_request.base.ref }}:${{ github.event.pull_request.base.ref }}
       shell: bash
 
+    - name: Install pandoc
+      run: sudo apt install -y pandoc
+      shell: bash
+
     - name: Install dependencies
       run: npm i -g pandiff
       shell: bash
