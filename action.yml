@@ -3,7 +3,7 @@ description: 'Runs pandiff on files changed in a PR'
 author: 'carafelix'
 inputs:
    file_extensions:
-    description: 'File extensions to diff ["*.md","*.html"]'
+    description: 'File extensions to diff separated by a space like: "*.md *.html *.etc"'
     required: false
     default: '*.md'
 outputs:
@@ -38,8 +38,15 @@ runs:
 
     - name: Run pandiff difftool on prose files
       run: |
-        for file in $(git diff --name-only ${{ github.event.pull_request.base.ref }}..HEAD -- '*.md' '*.txt'); do
+        echo "File extensions: ${{ inputs.file_extensions }}"
+        IFS=' ' read -ra EXTENSIONS <<< "${{ inputs.file_extensions }}"
+
+        for file in $(git diff --name-only ${{ github.event.pull_request.base.ref }}..HEAD -- '${EXTENSIONS[@]}'); do
           echo "Diffing $file"
-          git difftool -t pandiff -y ${{ github.event.pull_request.base.ref }}..HEAD -- "$file"
+
+          diff_result=$(git difftool -t pandiff -y ${{ github.event.pull_request.base.ref }}..HEAD -- "$file" || true)
+          diffs_output="${diffs_output}\n\nfilename: ${file}\n${diff_result}\n"
         done
+        echo -e "diffs<<EOF\n${diffs_output}\nEOF" >> $GITHUB_OUTPUT
       shell: bash
+      id: diffs
