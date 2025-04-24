@@ -26,6 +26,7 @@ runs:
       run: |
         git config --global difftool.pandiff.cmd 'pandiff "$LOCAL" "$REMOTE" -t html'
         git config --global alias.pandiff 'difftool -t pandiff -y'
+      shell: bash
 
     - name: Run pandiff with input
       run: git diff
