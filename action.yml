@@ -58,12 +58,13 @@ runs:
 
         echo "diffs=$(jq -c . <<< "$json_array")" >> $GITHUB_OUTPUT
 
-        echo "JSON array written to output.diffs in the form of { filename, diff }"
+        echo "Difftool finished"
+
       shell: bash
       id: difftool
 
     - name: echo difftool output
       run:  |
-        echo "echoing the JSON output"
+        echo "Pandiff json output in the form of { filename, diff: HTML }"
         echo '${{ steps.difftool.outputs.diffs }}' | jq .
       shell: bash
