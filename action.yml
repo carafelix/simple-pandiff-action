@@ -29,5 +29,5 @@ runs:
       shell: bash
 
     - name: Run pandiff with input
-      run: git diff
+      run: echo $(git pandiff)
       shell: bash
