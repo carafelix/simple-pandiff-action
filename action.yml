@@ -2,13 +2,14 @@ name: 'Pandiff Prose Changes'
 description: 'Runs pandiff on files changed in a PR'
 author: 'carafelix'
 inputs:
-   file_extensions:
+  file_extensions:
     description: 'File extensions to diff separated by a space like: "*.md *.html *.etc"'
     required: false
     default: '*.md'
 outputs:
   diffs:
-    description: 'Concatenated diffs for changed files'
+    description: 'Json array in the form of { filename, diff }'
+    value: ${{ steps.difftool.outputs.diffs }}
 
 runs:
   using: "composite"
@@ -30,7 +31,6 @@ runs:
       run: npm i -g pandiff
       shell: bash
 
-    
     - name: setup git pandiff
       run: |
         git config --global difftool.pandiff.cmd 'pandiff $LOCAL $REMOTE -t html'
@@ -40,7 +40,7 @@ runs:
       run: |
         echo "File extensions: ${{ inputs.file_extensions }}"
         IFS=' ' read -ra EXTENSIONS <<< "${{ inputs.file_extensions }}"
-        
+
         json_array="[]"
 
         for file in $(git diff --name-only ${{ github.event.pull_request.base.ref }}..HEAD -- "${EXTENSIONS[@]}"); do
@@ -48,10 +48,22 @@ runs:
 
           diff_result=$(git difftool -t pandiff -y ${{ github.event.pull_request.base.ref }}..HEAD -- "$file" || true)
           
-            json_entry=$(jq -n --arg filename "$file" --arg diff "$diff_result" '{filename: $file, diff: $diff}')
-            json_array=$(jq --argjson newItem "$json_entry" '. += [$newItem]' <<< "$json_array")
-
+            json_entry=$(jq -n \
+            --arg filename "$file" \
+            --arg diff "$diff_result" \
+            '{filename: $filename, diff: $diff}')
+          
+          json_array=$(jq --argjson newItem "$json_entry" '. += [$newItem]' <<< "$json_array")
         done
-        printf "diffs<<EOF\n%s\nEOF\n" "$json_array" >> $GITHUB_OUTPUT
+
+        echo "diffs=$(jq -c . <<< "$json_array")" >> $GITHUB_OUTPUT
+
+        echo "JSON array written to output.diffs in the form of { filename, diff }"
       shell: bash
-      id: diffs
+      id: difftool
+
+    - name: echo difftool output
+      run:  |
+        echo "echoing the JSON output"
+        echo '${{ steps.difftool.outputs.diffs }}' | jq .
+      shell: bash
