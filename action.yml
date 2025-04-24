@@ -1,0 +1,13 @@
+name: 'Pandiff Prose Changes'
+description: 'Runs pandiff on files changed in a PR'
+author: 'carafelix'
+inputs:
+  repo-token:
+    description: 'GitHub token for API access'
+    required: true
+outputs:
+  diffs:
+    description: 'Concatenated diffs for changed files'
+runs:
+  using: 'node20'
+  main: 'srcc/index.js'
