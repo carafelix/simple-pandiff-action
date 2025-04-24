@@ -29,6 +29,6 @@ runs:
       shell: bash
 
     - name: Run pandiff with input
-      run: echo "diffs=$(git pandiff)" >> $GITHUB_OUTPUT
+      run: echo "diffs=$(git pandiff ${{ github.event.pull_request.base.ref }})" >> $GITHUB_OUTPUT
       id: diffs
       shell: bash
