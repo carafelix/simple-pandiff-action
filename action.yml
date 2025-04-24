@@ -1,7 +1,11 @@
 name: 'Pandiff Prose Changes'
 description: 'Runs pandiff on files changed in a PR'
 author: 'carafelix'
-
+inputs:
+   file_extensions:
+    description: 'File extensions to diff ["*.md","*.html"]'
+    required: false
+    default: '*.md'
 outputs:
   diffs:
     description: 'Concatenated diffs for changed files'
@@ -26,13 +30,10 @@ runs:
       run: npm i -g pandiff
       shell: bash
 
-    - name: setup git pandiff
+    - name: Run pandiff difftool on prose files
       run: |
-        git config --global difftool.pandiff.cmd 'pandiff $LOCAL $REMOTE -t html'
-        git config --global alias.pandiff 'difftool -t pandiff -y'
-      shell: bash
-
-    - name: Run pandiff with input
-      run: echo "diffs=$(git pandiff ${{ github.event.pull_request.base.ref }})" >> $GITHUB_OUTPUT
-      id: diffs
+        for file in $(git diff --name-only ${{ github.event.pull_request.base.ref }}..HEAD -- '*.md' '*.txt'); do
+          echo "Diffing $file"
+          git difftool -t pandiff ${{ github.event.pull_request.base.ref }}..HEAD -- "$file"
+        done
       shell: bash
