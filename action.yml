@@ -1,10 +1,13 @@
 name: 'Pandiff Prose Changes'
 description: 'Runs pandiff on files changed in a PR'
 author: 'carafelix'
+
 inputs:
-  repo-token:
-    description: 'GitHub token for API access'
-    required: true
+  file1:
+    description: 'file1'
+  file2:
+    description: 'file2'
+
 outputs:
   diffs:
     description: 'Concatenated diffs for changed files'
@@ -12,12 +15,18 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
     - name: Install dependencies
-      run: npm install
+      run: npm i -g pandiff
       shell: bash
 
-    - name: Run Pandiff Prose Changes
-      run: node src/index.js
+    - name: setup git pandiff
+      run: |
+        git config --global difftool.pandiff.cmd 'pandiff "$LOCAL" "$REMOTE" -t html'
+        git config --global alias.pandiff 'difftool -t pandiff -y'
+
+    - name: Run pandiff with input
+      run: git diff
       shell: bash
-      env:
-        INPUT_REPO-TOKEN: ${{ inputs.repo-token }}
