@@ -6,8 +6,6 @@ outputs:
   diffs:
     description: 'Concatenated diffs for changed files'
 
-
-
 runs:
   using: "composite"
   steps:
@@ -16,23 +14,21 @@ runs:
       with:
         fetch-depth: 0
 
+    - name: Fetch base branch
+      run: git fetch origin ${{ github.event.pull_request.base.ref }}:${{ github.event.pull_request.base.ref }}
+      shell: bash
+
     - name: Install dependencies
       run: npm i -g pandiff
       shell: bash
 
     - name: setup git pandiff
       run: |
-        git config --global difftool.pandiff.cmd 'pandiff ${{ github.event.pull_request.base.ref }}" "$LOCAL" -t html'
+        git config --global difftool.pandiff.cmd 'pandiff ${{ github.event.pull_request.base.ref }} "$LOCAL" -t html'
         git config --global alias.pandiff 'difftool -t pandiff -y'
       shell: bash
 
     - name: Run pandiff with input
       run: echo "diffs=$(git pandiff)" >> $GITHUB_OUTPUT
       id: diffs
-      shell: bash
-
-    - name: Show PR branches
-      run: |
-        echo "Base branch: ${{ github.event.pull_request.base.ref }}"
-        echo "Head branch: ${{ github.event.pull_request.head.ref }}"
       shell: bash
