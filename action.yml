@@ -8,6 +8,16 @@ inputs:
 outputs:
   diffs:
     description: 'Concatenated diffs for changed files'
+
 runs:
-  using: 'node20'
-  main: 'src/index.js'
+  using: "composite"
+  steps:
+    - name: Install dependencies
+      run: npm install
+      shell: bash
+
+    - name: Run Pandiff Prose Changes
+      run: node src/index.js
+      shell: bash
+      env:
+        INPUT_REPO-TOKEN: ${{ inputs.repo-token }}
