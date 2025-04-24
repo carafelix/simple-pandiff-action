@@ -41,7 +41,7 @@ runs:
         echo "File extensions: ${{ inputs.file_extensions }}"
         IFS=' ' read -ra EXTENSIONS <<< "${{ inputs.file_extensions }}"
 
-        for file in $(git diff --name-only ${{ github.event.pull_request.base.ref }}..HEAD -- '${EXTENSIONS[@]}'); do
+        for file in $(git diff --name-only ${{ github.event.pull_request.base.ref }}..HEAD -- "${EXTENSIONS[@]}"); do
           echo "Diffing $file"
 
           diff_result=$(git difftool -t pandiff -y ${{ github.event.pull_request.base.ref }}..HEAD -- "$file" || true)
