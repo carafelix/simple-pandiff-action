@@ -10,4 +10,4 @@ outputs:
     description: 'Concatenated diffs for changed files'
 runs:
   using: 'node20'
-  main: 'srcc/index.js'
+  main: 'src/index.js'
