@@ -1,5 +1,6 @@
 name: 'Pandiff Prose Changes'
 description: 'Runs pandiff on files changed in a PR'
+icon: 'git-pull-request'
 author: 'carafelix'
 inputs:
   file_extensions:
