@@ -45,7 +45,11 @@ runs:
           echo "Diffing $file"
 
           diff_result=$(git difftool -t pandiff -y ${{ github.event.pull_request.base.ref }}..HEAD -- "$file" || true)
+          echo "${diff_result}"
+          
           diffs_output="${diffs_output}\n\nfilename: ${file}\n${diff_result}\n"
+
+
         done
         echo -e "diffs<<EOF\n${diffs_output}\nEOF" >> $GITHUB_OUTPUT
       shell: bash
